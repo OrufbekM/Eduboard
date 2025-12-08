@@ -1,0 +1,46 @@
+# Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Database
+*.sqlite3
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django migrations (agar kerak bo'lsa)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Static files (agar production uchun collectstatic qilinadigan bo'lsa)
+staticfiles/
+media/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Django secret key
+secret.txt

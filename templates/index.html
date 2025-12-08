@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu Board - Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/grdash.css' %}">
+    <link rel="stylesheet" href="{% static 'css/acc.css' %}">
+    <style>
+          body {
+            background-image: url("{% static 'images/bac.png' %}");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .icondiv{
+            background: url("{% static 'images/whiteplus.png' %}");
+            background-position: center;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <header>Choose your class : </header>
+    <main>
+        <div class="linguistic">
+            <h1>Linguistic</h1>
+            <a href="lessons/lessondash.html" class="classes">9:00 Elementary</a>
+        </div>
+        <div class="subject">
+            <h1>Subject</h1>
+            <a class="classes">10:30 SAT</a>
+        </div>
+    </main>
+
+    <div class="addClass"><div class="icondiv"></div>Add class </div>
+    <div class="acfullscreen"></div>
+    <div class="acform">
+        <form id="classForm" method="POST" action="#">
+            <input type="text" name="className" placeholder="Class name" required>
+            <input type="text" name="description" placeholder="Description" required>
+            <select id="category" name="category" required>
+                <option value="" disabled selected>Select category</option>
+                <option value="linguistic">Linguistic</option>
+                <option value="subject">Subject</option>
+            </select>
+            <div id="typeSelectContainer">
+                <select id="type" name="type" required>
+                    <option value="" disabled selected>Select type</option>
+                </select>
+            </div>
+            <button id="submitBtn" disabled>Add class</button>
+            <button id="cancelBtn">Cancel</button>
+        </form>
+    </div>
+
+    <script src="{% static 'js/root.js' %}"></script>
+    <script src="{% static 'js/ac.js' %}"></script>
+</body>
+</html>

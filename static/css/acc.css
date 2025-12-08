@@ -1,0 +1,85 @@
+
+form {
+    height: 300px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid var(--w1);
+    border-radius: 10px;
+    position: relative;
+}
+input, select, button {
+    padding: 10px;
+    font-size: 15px;
+    background: transparent;
+    color: var(--w1);
+    border: 1px solid var(--w1);
+    border-radius: 6px;
+}
+select option {
+    color: black;
+}
+#submitBtn , #cancelBtn{
+    height: 40px;
+    width: 130px;
+    border: none;
+    border-radius: 100px;
+    background: var(--w1);
+    color: var(--d1);
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+}
+#submitBtn{
+    bottom: 20px;
+    right:  20px;
+}
+#cancelBtn{
+    background: rgb(138, 34, 34);
+    color: var(--w1);
+    bottom: 20px;
+    left:   20px;
+}
+#submitBtn:disabled {
+    background: gray;
+    cursor: not-allowed;
+    color: #444;
+    border-color: #444;
+}
+#typeSelectContainer {
+    display: none;
+}
+
+.acfullscreen{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 7;
+    backdrop-filter: blur(9px);
+    display: none;
+}
+#type{
+    width: 100%;
+}
+
+
+.acform{
+    background: var(--d2);
+    position: fixed;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50% , -50%);
+    z-index: 8;
+}
+.acfullscreen.acfsa{
+    display: block;
+}
+.acform.acforma{
+    display: block;
+}

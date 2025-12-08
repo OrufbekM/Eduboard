@@ -1,0 +1,9 @@
+
+@font-face {
+  font-family: 'metropolis'; /* Choose a name for your font */
+  src: url('../fonts/Metropolis-Medium.otf') format('truetype'); /* Point to your TTF file */
+  font-weight: normal;
+  font-style: normal;
+}
+
+*{margin: 0;padding: 0;box-sizing: border-box;font-family: metropolis; transition: .2s linear;}
