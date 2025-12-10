@@ -48,8 +48,9 @@ select option {
     color: #444;
     border-color: #444;
 }
+
 #typeSelectContainer {
-    display: none;
+    display: block;
 }
 
 .acfullscreen{

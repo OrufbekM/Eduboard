@@ -1,73 +1,83 @@
-
-
-
-
-
-
-const categorySelect = document.getElementById("category");
-const typeSelect = document.getElementById("type");
-const typeContainer = document.getElementById("typeSelectContainer");
 const submitBtn = document.getElementById("submitBtn");
 const form = document.getElementById("classForm");
-const inputs = form.querySelectorAll("input, select");
 
-const linguisticTypes = [
-    "Uzbek-English",
-    "Russian-English",
-    "Uzbek-Russian",
-    "Ielts",
-    "Other"
-];
-
-const subjectTypes = [
-    "SAT",
-    "Other"
-];
-
-categorySelect.addEventListener("change", () => {
-    typeSelect.innerHTML = `<option value="" disabled selected>Select type</option>`;
-    if (categorySelect.value === "linguistic") {
-        linguisticTypes.forEach(t => {
-            typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
-        });
-    } else if (categorySelect.value === "subject") {
-        subjectTypes.forEach(t => {
-            typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
-        });
-    }
-    typeContainer.style.display = "block";
-    checkFormValidity();
-});
-
-inputs.forEach(el => el.addEventListener("input", checkFormValidity));
-function checkFormValidity() {
-    const valid = form.checkValidity();
-    submitBtn.disabled = !valid;
+// Forma to'liq to'ldirilganini tekshirish
+function isFormValid() {
+	return form && form.checkValidity();
 }
 
-var acbtn = document.querySelector(".addClass")
-var acfs = document.querySelector(".acfullscreen")
-var acform = document.querySelector(".acform")
-var accancel = document.querySelector("#cancelBtn")
+// Formani AJAX orqali faqat form mavjud bo'lsa yuboramiz
+if (form && submitBtn) {
+	form.addEventListener("submit", function (e) {
+		e.preventDefault();
+
+		if (!isFormValid()) {
+			form.reportValidity();
+			return;
+		}
+
+		submitBtn.disabled = true;
+
+		const formData = new FormData(form);
+
+		fetch(form.action, {
+			method: "POST",
+			body: formData,
+			headers: {
+				"X-Requested-With": "XMLHttpRequest",
+			},
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert(data.message || "Class created successfully!");
+					aremove();
+					window.location.reload();
+				} else {
+					alert(data.error || "Failed to create class.");
+				}
+			})
+			.catch(error => {
+				console.error("Error creating class:", error);
+				alert("Unexpected error while creating class.");
+			})
+			.finally(() => {
+				submitBtn.disabled = false;
+			});
+	});
+}
+
+var acbtn = document.querySelector(".addClass");
+var acfs = document.querySelector(".acfullscreen");
+var acform = document.querySelector(".acform");
+var accancel = document.querySelector("#cancelBtn");
 
 function acactive() {
-    acfs.classList.toggle("acfsa")
-    acform.classList.toggle("acforma")
+	if (!acfs || !acform) return;
+	acfs.classList.toggle("acfsa");
+	acform.classList.toggle("acforma");
 }
 
 function aremove() {
-    acfs.classList.remove("acfsa")
-    acform.classList.remove("acforma")
+	if (!acfs || !acform) return;
+	acfs.classList.remove("acfsa");
+	acform.classList.remove("acforma");
 }
 
-acbtn.addEventListener("click",()=>{
-    acactive();
-})
+if (acbtn) {
+	acbtn.addEventListener("click", () => {
+		acactive();
+	});
+}
 
-acfs.addEventListener("click",()=>{
-    acactive();
-})
+if (acfs) {
+	acfs.addEventListener("click", () => {
+		acactive();
+	});
+}
 
-accancel.addEventListener("click",()=>{
-    acactive();
-})
+if (accancel) {
+	accancel.addEventListener("click", () => {
+		acactive();
+	});
+}
