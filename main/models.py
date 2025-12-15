@@ -32,68 +32,51 @@ class Teacher(models.Model):
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-class LinguisticLesson(models.Model):
-    LANG_CHOICES = [
-        ("EN", "English"),
-        ("RU", "Russian"),
-    ]
 
-    teacher = models.ForeignKey(
-        Teacher, on_delete=models.CASCADE,
-        related_name="linguistic_lessons"
-    )
-    language = models.CharField(max_length=2, choices=LANG_CHOICES)
+class Category(models.Model):
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.get_language_display()} - {self.teacher.username}"
+        return self.name
 
 
-class SubjectLesson(models.Model):
-    SUBJECT_CHOICES = [
-        ("SAT", "SAT"),
-    ]
-
-    teacher = models.ForeignKey(
-        Teacher, on_delete=models.CASCADE,
-        related_name="subject_lessons"
+class Type(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="types"
     )
-    subject = models.CharField(max_length=20, choices=SUBJECT_CHOICES)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.get_subject_display()} - {self.teacher.username}"
-
-
-class Group(models.Model):
-    name = models.CharField(max_length=50)
-    linguistic_lesson = models.ForeignKey(
-        LinguisticLesson,
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
-        related_name="groups"
-    )
-    subject_lesson = models.ForeignKey(
-        SubjectLesson,
-        null=True, blank=True,
-        on_delete=models.SET_NULL, 
-        related_name="groups"
-    )
-
-    def __str__(self):
-        lessons = []
-        if self.linguistic_lesson:
-            lessons.append(str(self.linguistic_lesson))
-        if self.subject_lesson:
-            lessons.append(str(self.subject_lesson))
-        lesson_str = " + ".join(lessons) if lessons else "No lessons"
-        return f"{self.name} ({lesson_str})"
+        return f"{self.category} - {self.name}"
 
 
 class Lesson(models.Model):
-    name = models.CharField(max_length=50)
-    group = models.ForeignKey(
-        Group, on_delete=models.CASCADE,
-        related_name="lessons" 
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        related_name="lessons"
     )
+    type = models.ForeignKey(
+        Type,
+        on_delete=models.CASCADE,
+        related_name="lessons"
+    )
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.name} → {self.group.name}"
+        return self.name
+
+
+class RoadmapItem(models.Model):
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name="roadmap"
+    )
+    title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.lesson.name}  {self.title}"

@@ -7,56 +7,93 @@
     <title>Edu Board - Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/grdash.css' %}">
-    <link rel="stylesheet" href="{% static 'css/acc.css' %}">
+    <link rel="stylesheet" href="{% static 'css/acc.css' %}?v=2">
     <style>
-          body {
+        body {
             background-image: url("{% static 'images/bac.png' %}");
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
         }
-        .icondiv{
+        .icondiv {
             background: url("{% static 'images/whiteplus.png' %}");
             background-position: center;
             background-size: cover;
         }
+        @font-face {
+            font-family: 'metropolis';
+            src: url("{% static 'css/fonts/Metropolis-Medium.otf' %}") format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+        }
     </style>
 </head>
-<body>
+<body>    
     <header>Choose your class : </header>
+    
     <main>
         <div class="linguistic">
-            <h1>Linguistic</h1>
-            <a href="lessons/lessondash.html" class="classes">9:00 Elementary</a>
+            <h1>{{ linguistic_category.name|default:"Linguistic" }}</h1>
+            
+            {% if linguistic_lessons %}
+                {% for lesson in linguistic_lessons %}
+                <a href="" class="classes">
+                    {{ lesson.type.name }} - {{ lesson.name }}
+                </a>
+                {% endfor %}
+            {% else %}
+                <p class="classes">There are currently no linguistic added</p>
+            {% endif %}
         </div>
+        
         <div class="subject">
-            <h1>Subject</h1>
-            <a class="classes">10:30 SAT</a>
+            <h1>{{ subject_category.name|default:"Subject" }}</h1>
+            
+            {% if subject_lessons %}
+                {% for lesson in subject_lessons %}
+                <a href="" class="classes">
+                    {{ lesson.type.name }} - {{ lesson.name }}
+                </a>
+                {% endfor %}
+            {% else %}
+                <p class="classes">There are currently no subjects added</p>
+            {% endif %}
         </div>
     </main>
 
-    <div class="addClass"><div class="icondiv"></div>Add class </div>
+    <div class="addClass"><div class="icondiv"></div>Add class</div>
+    
     <div class="acfullscreen"></div>
     <div class="acform">
-        <form id="classForm" method="POST" action="#">
-            <input type="text" name="className" placeholder="Class name" required>
+        <form id="classForm" method="POST" action="{% url 'add_group' %}">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Lesson name" required>
             <input type="text" name="description" placeholder="Description" required>
-            <select id="category" name="category" required>
+            
+            <select id="category" name="category_id" required>
                 <option value="" disabled selected>Select category</option>
-                <option value="linguistic">Linguistic</option>
-                <option value="subject">Subject</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
             </select>
+            
             <div id="typeSelectContainer">
-                <select id="type" name="type" required>
-                    <option value="" disabled selected>Select type</option>
+                <select id="type_id" name="type_id" required>
+                    <option value="" disabled selected>Select lesson type</option>
+                    {% for type in types %}
+                    <option value="{{ type.id }}" data-category="{{ type.category.id }}">
+                        {{ type.category.name }} - {{ type.name }}
+                    </option>
+                    {% endfor %}
                 </select>
             </div>
-            <button id="submitBtn" disabled>Add class</button>
-            <button id="cancelBtn">Cancel</button>
+            
+            <button type="submit" id="submitBtn">Add class</button>
+            <button type="button" id="cancelBtn">Cancel</button>
         </form>
     </div>
 
     <script src="{% static 'js/root.js' %}"></script>
-    <script src="{% static 'js/ac.js' %}"></script>
+<script src="{% static 'js/ac.js' %}?v=2"></script>    
 </body>
 </html>
