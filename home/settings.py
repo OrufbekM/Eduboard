@@ -26,9 +26,9 @@ OPENAI_API_KEY = "sk-svcacct-ZglACNVFAf1aOvi_Ad21WDGH3NveF4YLAIvNQenMrT-PAult-Cn
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
