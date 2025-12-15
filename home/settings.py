@@ -29,7 +29,8 @@ OPENAI_API_KEY = "sk-svcacct-ZglACNVFAf1aOvi_Ad21WDGH3NveF4YLAIvNQenMrT-PAult-Cn
 DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
-
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # Application definition
 
