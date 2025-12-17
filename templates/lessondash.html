@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu Board - {{ class_obj.name }}</title>
+    <!-- Global styles + font -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- Page specific styles -->
+    <link rel="stylesheet" href="{% static 'css/lessondash.css' %}?v=3">
+    <style>
+        .menubtn{
+            background: url("{% static 'images/menu.svg' %}");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="menutoggle()" class="menubtn"></button>
+
+<div class="leftmenu">
+    <h1 class="rh1">Roadmap</h1>
+    <div class="roadmap">
+        {% if lessons %}
+            {% for lesson in lessons %}
+                <a href="#" class="ls">{{ lesson.name }}</a>
+            {% endfor %}
+        {% else %}
+            <p class="ls">No lessons yet</p>
+        {% endif %}
+
+        <!-- Add lesson form – inline in roadmap, hidden until button click -->
+        <form action="" method="POST" class="lessonform">
+            {% csrf_token %}
+            <input type="text" name="lesson_name" class="lessoninp" placeholder="Lesson name">
+            <div class="lessoncancel">Cancel</div>
+            <button type="submit" class="submitlesson">ADD</button>
+        </form>
+    </div>
+
+    <button class="addformer">Add Lesson</button>
+    <button class="editmode">Edit mode</button>
+    <button class="fullscreen" onclick="fullscreen()">Fullscreen</button>
+</div>
+
+<main class="main">
+    <div class="pages page1">
+        <div class="addItem">additem</div>
+        <div class="pagecontrols"></div>
+    </div>
+</main>
+<script src="{% static 'js/root.js' %}"></script>
+<script src="{% static 'js/fullscreen.js' %}?v=3"></script>
+</body></html>

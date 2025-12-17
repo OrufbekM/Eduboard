@@ -1,0 +1,142 @@
+body{
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: var(--d1);
+    color: var(--w1);
+}
+.fullscreen , .editmode , .addformer{
+    background: var(--d1);
+    color: var(--w1);
+    border: 1px solid;
+    border-radius: 8px;
+    height: 35px;
+    font-size: 19px;
+    margin: 5px 10px;
+    display: grid;place-items: center;
+    position: relative;
+
+}
+.addformer{
+    background: var(--l1);
+    color: var(--w1);
+    border: none;
+    box-shadow: 0 0 4px var(--l1);
+}
+.fullscreen:hover , .editmode:hover , .addformer:hover {
+    box-shadow: 0 0 8px var(--w1);
+}
+.leftmenu{
+    width: 250px;
+    height: 100vh;
+    background: var(--d1);
+    border-right: 2px solid var(--w1);
+    z-index: 9;
+    position: fixed;
+    top: 0;
+    left: -260px; /* hidden by default */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 20px 0;
+    overflow-y: auto;
+    transition: left .2s linear;
+}
+    
+
+.rh1{
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+.roadmap{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.roadmap::-webkit-scrollbar{
+    width: 0; /* hide scrollbar in WebKit */
+}
+.roadmap{
+    scrollbar-width: none; /* hide scrollbar in Firefox */
+}
+.ls{
+    color: var(--w1);
+    text-decoration: none;
+    width: 100%;
+    height: 35px;
+    border-top: 1px solid var(--w1);
+    border-bottom: 1px solid var(--w1);
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+}
+.lessonform{
+    width: 100%;
+    padding: 10px 0;
+    display: none;
+    flex-direction: column;
+    grid-gap: 8px;
+}
+.activeform {
+    display: flex;
+}
+.lessoncancel , .submitlesson , .lessoninp{
+    background: var(--d1);
+    color: var(--w1);
+    border: 1px solid;
+    outline: none;
+    height: 35px;
+    border-radius: 8px;
+    font-size: 18px;
+    display: grid;place-items: center;
+    padding: 0 10px;
+}
+.lessoncancel{
+    cursor: pointer;
+    background: rgb(138, 34, 34);
+    border: 1px solid rgb(138, 34, 34);;
+}
+/* Menu button  */
+
+.menubtn{
+    width: 45px;
+    height: 45px;
+    background: url(../images/menu.svg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    line-height: 12px;
+    display: grid;place-items: center;
+    font-size: 100px;
+    position: fixed;
+    z-index: 99;
+    left: 0px;
+    top: 5px;
+    border: none;
+    cursor: pointer;
+}
+.menuactive{
+    left: 0px;    
+}
+.menubtnctive{
+    left: 255px;
+}
+.submitlesson{
+    background: var(--l1);
+    color: var(--w1);
+    border: none;
+    box-shadow: 0 0 4px var(--l1);
+}
+.main{
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+}
+

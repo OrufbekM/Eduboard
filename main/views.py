@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .models import Teacher, Category, Type, Lesson, RoadmapItem
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Teacher, Category, Type, Lesson, RoadmapItem, Class
 
 from .form import LessonForm
 from .services import ask_ai
@@ -76,20 +76,20 @@ def home_view(request):
     subject_category = Category.objects.filter(name__iexact='Subject').first()
 
     if linguistic_category:
-        linguistic_lessons = Lesson.objects.filter(
+        linguistic_classes = Class.objects.filter(
             teacher=teacher,
             type__category=linguistic_category
         ).select_related('type', 'type__category')
     else:
-        linguistic_lessons = Lesson.objects.none()
+        linguistic_classes = Class.objects.none()
 
     if subject_category:
-        subject_lessons = Lesson.objects.filter(
+        subject_classes = Class.objects.filter(
             teacher=teacher,
             type__category=subject_category
         ).select_related('type', 'type__category')
     else:
-        subject_lessons = Lesson.objects.none()
+        subject_classes = Class.objects.none()
 
     categories = Category.objects.all()
     types = Type.objects.select_related('category').all()
@@ -100,8 +100,8 @@ def home_view(request):
         'teacher': teacher,
         'linguistic_category': linguistic_category,
         'subject_category': subject_category,
-        'linguistic_lessons': linguistic_lessons,
-        'subject_lessons': subject_lessons,
+        'linguistic_classes': linguistic_classes,
+        'subject_classes': subject_classes,
         'categories': categories,
         'types': types,
         'current_time': current_time,
@@ -187,7 +187,7 @@ def add_group_view(request):
             if not name:
                 return JsonResponse({
                     'success': False, 
-                    'error': 'Lesson name is required'
+                    'error': 'Class name is required'
                 })
             
             if not category_id or not type_id:
@@ -204,27 +204,27 @@ def add_group_view(request):
                 })
 
             try:
-                lesson_type = Type.objects.get(id=int(type_id), category=category)
+                class_type = Type.objects.get(id=int(type_id), category=category)
             except (Type.DoesNotExist, ValueError):
                 return JsonResponse({
                     'success': False,
                     'error': 'Selected type is invalid for this category'
                 })
 
-            lesson = Lesson.objects.create(
+            class_obj = Class.objects.create(
                 teacher=teacher,
-                type=lesson_type,
+                type=class_type,
                 name=name,
                 description=description,
             )
 
             return JsonResponse({
                 'success': True,
-                'message': f'Lesson "{name}" created successfully!',
-                'lesson_id': lesson.id,
-                'lesson_name': lesson.name,
-                'type_name': lesson.type.name,
-                'category_name': lesson.type.category.name,
+                'message': f'Class "{name}" created successfully!',
+                'class_id': class_obj.id,
+                'class_name': class_obj.name,
+                'type_name': class_obj.type.name,
+                'category_name': class_obj.type.category.name,
             })
             
         except Exception as e:
@@ -237,6 +237,45 @@ def add_group_view(request):
         'success': False, 
         'error': 'Invalid request method'
     })
+
+
+def class_detail_view(request, class_id):
+    """Displays a single class dashboard and allows creating lessons inside it."""
+    if not request.session.get('teacher_id'):
+        return redirect('login')
+
+    teacher_id = request.session['teacher_id']
+    class_obj = get_object_or_404(Class.objects.select_related('type', 'teacher'), id=class_id, teacher_id=teacher_id)
+
+    if request.method == 'POST':
+        lesson_name = request.POST.get('lesson_name', '').strip()
+        if not lesson_name:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'Lesson name is required'})
+            messages.error(request, 'Lesson name is required')
+        else:
+            lesson = Lesson.objects.create(
+                teacher=class_obj.teacher,
+                type=class_obj.type,
+                related_class=class_obj,
+                name=lesson_name,
+            )
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'lesson_id': lesson.id,
+                    'lesson_name': lesson.name,
+                })
+            # Non-AJAX: just redirect quietly, no success message
+            return redirect('class_detail', class_id=class_obj.id)
+
+    lessons = class_obj.lessons.all().order_by('id')
+
+    context = {
+        'class_obj': class_obj,
+        'lessons': lessons,
+    }
+    return render(request, 'lessondash.html', context)
 
 def get_lessons_view(request):
     """AJAX uchun lesson turlari va kategoriyalar ro'yxatini qaytarish"""

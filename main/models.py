@@ -52,6 +52,25 @@ class Type(models.Model):
         return f"{self.category} - {self.name}"
 
 
+class Class(models.Model):
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        related_name="classes",
+    )
+    type = models.ForeignKey(
+        Type,
+        on_delete=models.CASCADE,
+        related_name="classes",
+    )
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.type})"
+
+
 class Lesson(models.Model):
     teacher = models.ForeignKey(
         Teacher,
@@ -63,8 +82,12 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         related_name="lessons"
     )
+    related_class = models.ForeignKey(
+        Class,
+        on_delete=models.CASCADE,
+        related_name="lessons",
+    )
     name = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name

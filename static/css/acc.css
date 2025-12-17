@@ -10,13 +10,36 @@ form {
     border-radius: 10px;
     position: relative;
 }
-input, select, button {
+input, select {
     padding: 10px;
     font-size: 15px;
     background: transparent;
     color: var(--w1);
     border: 1px solid var(--w1);
     border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+}
+
+button {
+    padding: 10px;
+    font-size: 15px;
+    background: transparent;
+    color: var(--w1);
+    border: 1px solid var(--w1);
+    border-radius: 6px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+input:focus, select:focus {
+    border-color: var(--w1);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 select option {
     color: black;
@@ -50,7 +73,12 @@ select option {
 }
 
 #typeSelectContainer {
-    display: block;
+    display: none;
+    width: 100%;
+}
+
+#typeSelectContainer select {
+    width: 100%;
 }
 
 .acfullscreen{

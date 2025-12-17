@@ -35,28 +35,28 @@
         <div class="linguistic">
             <h1>{{ linguistic_category.name|default:"Linguistic" }}</h1>
             
-            {% if linguistic_lessons %}
-                {% for lesson in linguistic_lessons %}
-                <a href="" class="classes">
-                    {{ lesson.type.name }} - {{ lesson.name }}
+            {% if linguistic_classes %}
+                {% for class_obj in linguistic_classes %}
+                <a href="{% url 'class_detail' class_obj.id %}" class="classes">
+                    {{ class_obj.type.name }} - {{ class_obj.name }}
                 </a>
                 {% endfor %}
             {% else %}
-                <p class="classes">There are currently no linguistic added</p>
+                <p class="classes">There are currently no linguistic classes added</p>
             {% endif %}
         </div>
         
         <div class="subject">
             <h1>{{ subject_category.name|default:"Subject" }}</h1>
             
-            {% if subject_lessons %}
-                {% for lesson in subject_lessons %}
-                <a href="" class="classes">
-                    {{ lesson.type.name }} - {{ lesson.name }}
+            {% if subject_classes %}
+                {% for class_obj in subject_classes %}
+                <a href="{% url 'class_detail' class_obj.id %}" class="classes">
+                    {{ class_obj.type.name }} - {{ class_obj.name }}
                 </a>
                 {% endfor %}
             {% else %}
-                <p class="classes">There are currently no subjects added</p>
+                <p class="classes">There are currently no subject classes added</p>
             {% endif %}
         </div>
     </main>

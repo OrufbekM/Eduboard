@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'home.wsgi.application'
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # .env faylni yuklaydi
+load_dotenv()  
 
 DATABASES = {
     'default': {

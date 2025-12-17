@@ -30,16 +30,16 @@ if (form && submitBtn) {
 			.then(response => response.json())
 			.then(data => {
 				if (data.success) {
-					alert(data.message || "Class created successfully!");
+					// Close modal and silently refresh list
 					aremove();
 					window.location.reload();
 				} else {
-					alert(data.error || "Failed to create class.");
+					// You can later show inline error instead of alert if needed
+					console.error("Create class error:", data.error);
 				}
 			})
 			.catch(error => {
 				console.error("Error creating class:", error);
-				alert("Unexpected error while creating class.");
 			})
 			.finally(() => {
 				submitBtn.disabled = false;
@@ -62,6 +62,21 @@ function aremove() {
 	if (!acfs || !acform) return;
 	acfs.classList.remove("acfsa");
 	acform.classList.remove("acforma");
+	
+	// Form yopilganda reset qilish
+	const categorySelect = document.getElementById("category");
+	const typeSelect = document.getElementById("type_id");
+	const typeSelectContainer = document.getElementById("typeSelectContainer");
+	
+	if (categorySelect && typeSelect && typeSelectContainer) {
+		typeSelectContainer.style.display = "none";
+		typeSelect.value = "";
+		categorySelect.value = "";
+		// Formani ham reset qilish
+		if (form) {
+			form.reset();
+		}
+	}
 }
 
 if (acbtn) {
@@ -72,12 +87,53 @@ if (acbtn) {
 
 if (acfs) {
 	acfs.addEventListener("click", () => {
-		acactive();
+		aremove(); // Formani yopish va reset qilish
 	});
 }
 
 if (accancel) {
 	accancel.addEventListener("click", () => {
-		acactive();
+		aremove(); // Formani yopish va reset qilish
 	});
+}
+
+// Category va lesson type dropdownlarni boshqarish
+const categorySelect = document.getElementById("category");
+const typeSelect = document.getElementById("type_id");
+const typeSelectContainer = document.getElementById("typeSelectContainer");
+
+if (categorySelect && typeSelect && typeSelectContainer) {
+	// Category tanlanganda
+	categorySelect.addEventListener("change", function() {
+		const selectedCategoryId = this.value;
+		
+		if (selectedCategoryId) {
+			// Lesson type dropdownni ko'rsatish
+			typeSelectContainer.style.display = "block";
+			
+			// Faqat tanlangan categoryga tegishli lesson typelarni ko'rsatish
+			const options = typeSelect.querySelectorAll("option");
+			options.forEach(option => {
+				if (option.value === "") {
+					// Placeholder optionni har doim ko'rsatish
+					option.style.display = "block";
+				} else {
+					const optionCategoryId = option.getAttribute("data-category");
+					if (optionCategoryId === selectedCategoryId) {
+						option.style.display = "block";
+					} else {
+						option.style.display = "none";
+					}
+				}
+			});
+			
+			// Type selectni reset qilish
+			typeSelect.value = "";
+		} else {
+			// Category tanlanmagan bo'lsa, lesson type dropdownni yashirish
+			typeSelectContainer.style.display = "none";
+			typeSelect.value = "";
+		}
+	});
+	
 }
