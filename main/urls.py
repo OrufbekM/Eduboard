@@ -9,4 +9,5 @@ urlpatterns = [
     path('get-lessons/', views.get_lessons_view, name='get_lessons'),
     path('add-class-form/', views.show_add_form_view, name='add_class_form'),
     path('class/<int:class_id>/', views.class_detail_view, name='class_detail'),
+    path('public-lessons/', views.public_lessons_view, name='public_lessons'),
 ]

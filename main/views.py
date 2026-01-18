@@ -1,5 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Teacher, Category, Type, Lesson, RoadmapItem, Class
+from .models import (
+    User,
+    Category,
+    Type,
+    Lesson,
+    RoadmapItem,
+    Class,
+)
 
 from .form import LessonForm
 from .services import ask_ai
@@ -37,39 +44,53 @@ def login_view(request):
         password = request.POST.get('password')
         
         try:
-            teacher = Teacher.objects.get(email=email)
-            if hasattr(teacher, 'check_password'):
-                if teacher.check_password(password):
-                    request.session['teacher_id'] = teacher.id
-                    request.session['teacher_name'] = f"{teacher.first_name} {teacher.last_name}"
+            user = User.objects.get(email=email)
+            # Check if user is active (not suspended)
+            if user.status == User.STATUS_SUSPENDED:
+                messages.error(request, 'Your account has been suspended. Please contact admin.')
+                return render(request, 'login.html')
+            
+            # Simple password check (can be enhanced with proper hashing)
+            if hasattr(user, 'check_password'):
+                if user.check_password(password):
+                    request.session['user_id'] = user.id
+                    request.session['user_name'] = f"{user.first_name} {user.last_name}"
+                    request.session['user_role'] = user.role
                     return redirect('home') 
                 else:
                     messages.error(request, 'Invalid password')
             else:
-                if teacher.password == password:
-                    request.session['teacher_id'] = teacher.id
-                    request.session['teacher_name'] = f"{teacher.first_name} {teacher.last_name}"
+                # Fallback for plain password (should be removed in production)
+                if user.password == password:
+                    request.session['user_id'] = user.id
+                    request.session['user_name'] = f"{user.first_name} {user.last_name}"
+                    request.session['user_role'] = user.role
                     return redirect('home')
                 else:
                     messages.error(request, 'Invalid password')
                     
-        except Teacher.DoesNotExist:
+        except User.DoesNotExist:
             messages.error(request, 'Email not found')
     
     return render(request, 'login.html')
 
 def home_view(request):
-    if not request.session.get('teacher_id'):
+    if not request.session.get('user_id'):
         return redirect('login')
-    teacher_id = request.session.get('teacher_id')
-    if not teacher_id:
+    user_id = request.session.get('user_id')
+    if not user_id:
         messages.error(request, 'Please login first')
         return redirect('login')
     
     try:
-        teacher = Teacher.objects.get(id=teacher_id)
-    except Teacher.DoesNotExist:
-        messages.error(request, 'Teacher not found')
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found')
+        return redirect('login')
+
+    # Only TEACHER, MANAGER, and MAIN_MANAGER can access dashboard
+    if user.role == User.ROLE_PUBLIC_USER:
+        messages.error(request, 'Public users cannot access the dashboard')
         return redirect('login')
 
     linguistic_category = Category.objects.filter(name__iexact='Linguistic').first()
@@ -77,7 +98,7 @@ def home_view(request):
 
     if linguistic_category:
         linguistic_classes = Class.objects.filter(
-            teacher=teacher,
+            teacherOfClass=user,
             type__category=linguistic_category
         ).select_related('type', 'type__category')
     else:
@@ -85,7 +106,7 @@ def home_view(request):
 
     if subject_category:
         subject_classes = Class.objects.filter(
-            teacher=teacher,
+            teacherOfClass=user,
             type__category=subject_category
         ).select_related('type', 'type__category')
     else:
@@ -97,7 +118,8 @@ def home_view(request):
     current_time = timezone.now()
 
     context = {
-        'teacher': teacher,
+        'user': user,
+        'teacher': user,  # For backward compatibility with templates
         'linguistic_category': linguistic_category,
         'subject_category': subject_category,
         'linguistic_classes': linguistic_classes,
@@ -168,7 +190,7 @@ def logout_view(request):
 @csrf_exempt
 def add_group_view(request):
     
-    if not request.session.get('teacher_id'):
+    if not request.session.get('user_id'):
         return JsonResponse({
             'success': False, 
             'error': 'Please login first'
@@ -176,8 +198,15 @@ def add_group_view(request):
     
     if request.method == 'POST':
         try:
-            teacher_id = request.session['teacher_id']
-            teacher = Teacher.objects.get(id=teacher_id)
+            user_id = request.session['user_id']
+            user = User.objects.get(id=user_id)
+            
+            # Only TEACHER, MANAGER, and MAIN_MANAGER can create classes
+            if user.role == User.ROLE_PUBLIC_USER:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Public users cannot create classes'
+                })
             
             name = request.POST.get('name', '').strip()
             description = request.POST.get('description', '').strip()
@@ -212,10 +241,12 @@ def add_group_view(request):
                 })
 
             class_obj = Class.objects.create(
-                teacher=teacher,
+                teacherOfClass=user,
                 type=class_type,
                 name=name,
                 description=description,
+                organization=user.organization,
+                branch=user.branch,
             )
 
             return JsonResponse({
@@ -241,11 +272,11 @@ def add_group_view(request):
 
 def class_detail_view(request, class_id):
     """Displays a single class dashboard and allows creating lessons inside it."""
-    if not request.session.get('teacher_id'):
+    if not request.session.get('user_id'):
         return redirect('login')
 
-    teacher_id = request.session['teacher_id']
-    class_obj = get_object_or_404(Class.objects.select_related('type', 'teacher'), id=class_id, teacher_id=teacher_id)
+    user_id = request.session['user_id']
+    class_obj = get_object_or_404(Class.objects.select_related('type', 'teacherOfClass'), id=class_id, teacherOfClass_id=user_id)
 
     if request.method == 'POST':
         lesson_name = request.POST.get('lesson_name', '').strip()
@@ -254,17 +285,19 @@ def class_detail_view(request, class_id):
                 return JsonResponse({'success': False, 'error': 'Lesson name is required'})
             messages.error(request, 'Lesson name is required')
         else:
+            # Create lesson with created_by and title
             lesson = Lesson.objects.create(
-                teacher=class_obj.teacher,
+                created_by=class_obj.teacherOfClass,
                 type=class_obj.type,
                 related_class=class_obj,
-                name=lesson_name,
+                title=lesson_name,
+                name=lesson_name,  # For backward compatibility
             )
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True,
                     'lesson_id': lesson.id,
-                    'lesson_name': lesson.name,
+                    'lesson_name': lesson.title or lesson.name,
                 })
             # Non-AJAX: just redirect quietly, no success message
             return redirect('class_detail', class_id=class_obj.id)
@@ -280,7 +313,7 @@ def class_detail_view(request, class_id):
 def get_lessons_view(request):
     """AJAX uchun lesson turlari va kategoriyalar ro'yxatini qaytarish"""
     
-    if not request.session.get('teacher_id'):
+    if not request.session.get('user_id'):
         return JsonResponse({'lessons': []})
     
     try:
@@ -309,7 +342,31 @@ def get_lessons_view(request):
 def show_add_form_view(request):
     """Add form sahifasini ko'rsatish (agar alohida sahifa kerak bo'lsa)"""
     
-    if not request.session.get('teacher_id'):
+    if not request.session.get('user_id'):
         return redirect('login')
     
     return home_view(request)
+
+
+def public_lessons_view(request):
+    """
+    Public hub endpoint.
+    Shows only lessons that are marked as PUBLIC, without requiring login.
+    Accessible by PUBLIC_USER and all other roles.
+
+    Later this can be expanded with filters (by teacher, organization, subject, etc.).
+    """
+    public_lessons = Lesson.objects.filter(
+        privacy=Lesson.PRIVACY_PUBLIC
+    ).select_related(
+        "created_by",
+        "related_class",
+        "related_class__teacherOfClass",
+        "organization",
+    ).order_by("-created_at")
+
+    context = {
+        "lessons": public_lessons,
+    }
+    # You can create a dedicated template (e.g. public_lessons.html) later.
+    return render(request, "public_lessons.html", context)
