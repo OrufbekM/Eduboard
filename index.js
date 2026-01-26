@@ -6,6 +6,8 @@ require('dotenv').config();
 
 const authRoutes = require('./app/routes/auth.routes');
 const classCategoryRoutes = require('./app/routes/classCategory.routes');
+const classRoutes = require('./app/routes/class.routes');
+const lessonRoutes = require('./app/routes/lesson.routes');
 const db = require('./app/models');
 
 const app = express();
@@ -16,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/class-category', classCategoryRoutes);
+app.use('/api/class', classRoutes);
+app.use('/api/lesson', lessonRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to EduBoard API' });
