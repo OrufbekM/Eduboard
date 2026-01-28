@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/auth.middleware");
  
 const {
   createClassCategory,
+  getAllClassCategories,
+  getClassCategoryById,
   updateClassCategory,
   deleteClassCategory,
 } = require("../controllers/classCategory.controller");
@@ -13,8 +16,10 @@ const {
   validateClassCategoryId,
 } = require("../middleware/classCategory.middleware");
 
-router.post("/create", validateCreateClassCategory, createClassCategory);
-router.put("/:id/update", validateUpdateClassCategory, updateClassCategory);
-router.delete("/:id/delete", validateClassCategoryId, deleteClassCategory);
+router.post("/create", authMiddleware, validateCreateClassCategory, createClassCategory);
+router.get("/", authMiddleware, getAllClassCategories);
+router.get("/:id", authMiddleware, validateClassCategoryId, getClassCategoryById);
+router.put("/:id/update", authMiddleware, validateUpdateClassCategory, updateClassCategory);
+router.delete("/:id/delete", authMiddleware, validateClassCategoryId, deleteClassCategory);
 
 module.exports = router;

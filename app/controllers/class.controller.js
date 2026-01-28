@@ -33,14 +33,18 @@ const getAllClasses = async (req, res) => {
 
 const getClassById = async (req, res) => {
   try {
-    const classItem = req.classItem;
+    const { id } = req.params;
     
-    const classWithCategory = await Class.findByPk(classItem.id, {
+    const classWithCategory = await Class.findByPk(id, {
       include: [{
         model: ClassCategory,
         as: 'category'
       }]
     });
+
+    if (!classWithCategory) {
+      return res.status(404).json({ message: 'Class not found' });
+    }
 
     res.status(200).json(classWithCategory);
   } catch (error) {

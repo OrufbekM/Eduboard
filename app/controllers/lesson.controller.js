@@ -32,14 +32,18 @@ const getAllLessons = async (req, res) => {
 
 const getLessonById = async (req, res) => {
   try {
-    const lesson = req.lesson;
+    const { id } = req.params;
     
-    const lessonWithClass = await Lesson.findByPk(lesson.id, {
+    const lessonWithClass = await Lesson.findByPk(id, {
       include: [{
         model: Class,
         as: 'class'
       }]
     });
+
+    if (!lessonWithClass) {
+      return res.status(404).json({ message: 'Lesson not found' });
+    }
 
     res.status(200).json(lessonWithClass);
   } catch (error) {
