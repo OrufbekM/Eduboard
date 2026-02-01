@@ -9,7 +9,7 @@ const toPublicPath = (absolutePath) => {
 
 const createLesson = async (req, res) => {
   try {
-    const { name, classId, text } = req.body;
+    const { name, classId, text } = req.body || {};
     const userId = req.user.id;
     const imagePath = req.files && req.files.image ? toPublicPath(req.files.image[0].path) : null;
     const videoPath = req.files && req.files.video ? toPublicPath(req.files.video[0].path) : null;
@@ -72,7 +72,7 @@ const getLessonById = async (req, res) => {
 const updateLesson = async (req, res) => {
   try {
     const lesson = req.lesson;
-    const { name, classId, text } = req.body;
+    const { name, classId, text } = req.body || {};
     const imagePath = req.files && req.files.image ? toPublicPath(req.files.image[0].path) : undefined;
     const videoPath = req.files && req.files.video ? toPublicPath(req.files.video[0].path) : undefined;
 

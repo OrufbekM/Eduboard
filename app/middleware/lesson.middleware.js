@@ -18,7 +18,7 @@ const checkLessonExists = async (req, res, next) => {
 
 const validateLessonData = async (req, res, next) => {
   try {
-    const { name, classId } = req.body;
+    const { name, classId } = req.body || {};
     
     if (!name || name.trim() === '') {
       return res.status(400).json({ message: 'Name is required' });

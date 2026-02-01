@@ -10,13 +10,13 @@ const generateTokens = (user) => {
   const accessToken = jwt.sign(
     { userId: user.id, email: user.email },
     JWT_SECRET,
-    { expiresIn: '15m' }
+    { expiresIn: '1d' }
   );
   
   const refreshToken = jwt.sign(
     { userId: user.id, email: user.email },
     REFRESH_TOKEN_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: '14d' }
   );
   
   return { accessToken, refreshToken };
