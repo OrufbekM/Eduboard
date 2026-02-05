@@ -4,6 +4,7 @@ const ClassCategory = require("./classCategory.model")(sequelize, require("seque
 const Class = require("./class.model")(sequelize, require("sequelize").DataTypes);
 const Lesson = require("./lesson.model")(sequelize, require("sequelize").DataTypes);
 const LessonMedia = require("./lessonMedia.model")(sequelize, require("sequelize").DataTypes);
+const Folder = require("./folder.model")(sequelize, require("sequelize").DataTypes);
 
 const db = {};
 db.sequelize = sequelize;
@@ -14,6 +15,7 @@ db.ClassCategory = ClassCategory;
 db.Class = Class;
 db.Lesson = Lesson;
 db.LessonMedia = LessonMedia;
+db.Folder = Folder;
 
 // Setup associations
 Object.keys(db).forEach(modelName => {

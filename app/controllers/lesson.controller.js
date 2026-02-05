@@ -1,4 +1,4 @@
-const { Lesson, Class } = require('../models');
+const { Lesson, Class, Folder } = require('../models');
 const path = require('path');
 
 const toPublicPath = (absolutePath) => {
@@ -9,7 +9,8 @@ const toPublicPath = (absolutePath) => {
 
 const createLesson = async (req, res) => {
   try {
-    const { name, classId, text } = req.body || {};
+    const { name, classId, text, folderId } = req.body || {};
+    const normalizedFolderId = folderId === '' ? null : folderId;
     const userId = req.user.id;
     const imagePath = req.files && req.files.image ? toPublicPath(req.files.image[0].path) : null;
     const videoPath = req.files && req.files.video ? toPublicPath(req.files.video[0].path) : null;
@@ -20,7 +21,8 @@ const createLesson = async (req, res) => {
       userId,
       image: imagePath,
       video: videoPath,
-      text: text || null
+      text: text || null,
+      folderId: normalizedFolderId || null
     });
 
     res.status(201).json(newLesson);
@@ -37,6 +39,9 @@ const getAllLessons = async (req, res) => {
       include: [{
         model: Class,
         as: 'class'
+      }, {
+        model: Folder,
+        as: 'folder'
       }]
     });
     
@@ -56,6 +61,9 @@ const getLessonById = async (req, res) => {
       include: [{
         model: Class,
         as: 'class'
+      }, {
+        model: Folder,
+        as: 'folder'
       }]
     });
 
@@ -72,7 +80,8 @@ const getLessonById = async (req, res) => {
 const updateLesson = async (req, res) => {
   try {
     const lesson = req.lesson;
-    const { name, classId, text } = req.body || {};
+    const { name, classId, text, folderId } = req.body || {};
+    const normalizedFolderId = folderId === '' ? null : folderId;
     const imagePath = req.files && req.files.image ? toPublicPath(req.files.image[0].path) : undefined;
     const videoPath = req.files && req.files.video ? toPublicPath(req.files.video[0].path) : undefined;
 
@@ -80,6 +89,7 @@ const updateLesson = async (req, res) => {
       name,
       classId,
       text: text ?? lesson.text,
+      folderId: normalizedFolderId ?? lesson.folderId,
     };
     if (imagePath !== undefined) updatePayload.image = imagePath;
     if (videoPath !== undefined) updatePayload.video = videoPath;

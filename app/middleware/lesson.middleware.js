@@ -1,4 +1,4 @@
-const { Lesson, Class } = require('../models');
+const { Lesson, Class, Folder } = require('../models');
 
 const checkLessonExists = async (req, res, next) => {
   try {
@@ -18,7 +18,8 @@ const checkLessonExists = async (req, res, next) => {
 
 const validateLessonData = async (req, res, next) => {
   try {
-    const { name, classId } = req.body || {};
+    const { name, classId, folderId } = req.body || {};
+    const userId = req.user.id;
     
     if (!name || name.trim() === '') {
       return res.status(400).json({ message: 'Name is required' });
@@ -50,6 +51,17 @@ const checkLessonAccess = async (req, res, next) => {
     }
 
     req.lesson = lesson;
+    if (folderId !== undefined && folderId !== null && folderId !== '') {
+      if (isNaN(folderId)) {
+        return res.status(400).json({ message: 'Folder ID must be a number' });
+      }
+
+      const folder = await Folder.findOne({ where: { id: folderId, classId, userId } });
+      if (!folder) {
+        return res.status(400).json({ message: 'Folder not found for this class' });
+      }
+    }
+
     next();
   } catch (error) {
     res.status(500).json({ message: error.message });

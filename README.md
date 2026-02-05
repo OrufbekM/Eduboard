@@ -87,12 +87,25 @@ Base URL (render): `https://eduboard-dste.onrender.com/api`
 
 ### Lessons (requires auth)
 - `POST /lesson/create` – create lesson (multipart/form-data)
-  - fields: `name`, `classId`, `text?`, `image?`, `video?`
+  - fields: `name`, `classId`, `text?`, `image?`, `video?`, `folderId?`
 - `GET /lesson` – list lessons (with class)
 - `GET /lesson/:id` – get lesson by id
 - `PUT /lesson/:id/update` – update lesson (multipart/form-data)
-  - fields: `name`, `classId`, `text?`, `image?`, `video?`
+  - fields: `name`, `classId`, `text?`, `image?`, `video?`, `folderId?`
 - `DELETE /lesson/:id/delete` – delete lesson
+
+### Folders (requires auth)
+- `POST /folder/create` – create folder
+  - body: `{ name, classId, parentId?, orderIndex? }`
+- `GET /folder?classId=...` – list folders by class
+- `GET /folder/:id` – get folder by id
+- `PUT /folder/:id/update` – update folder
+  - body: `{ name }`
+- `PUT /folder/:id/reorder` – update folder order
+  - body: `{ orderIndex }`
+- `PUT /folder/:id/move` – move folder between class/parent
+  - body: `{ classId?, parentId?, orderIndex? }`
+- `DELETE /folder/:id/delete` – delete folder (also deletes lessons inside)
 
 ### Auth header
 For protected routes:

@@ -7,6 +7,7 @@ const authRoutes = require('./app/routes/auth.routes');
 const classCategoryRoutes = require('./app/routes/classCategory.routes');
 const classRoutes = require('./app/routes/class.routes');
 const lessonRoutes = require('./app/routes/lesson.routes');
+const folderRoutes = require('./app/routes/folder.routes');
 const db = require('./app/models');
 
 const app = express();
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/class-category', classCategoryRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api/lesson', lessonRoutes);
+app.use('/api/folder', folderRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to EduNova API' });

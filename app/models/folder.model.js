@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const Lesson = sequelize.define(
-    "Lesson",
+  const Folder = sequelize.define(
+    "Folder",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -30,55 +30,50 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      image: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        field: "image",
-      },
-      video: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        field: "video",
-      },
-      text: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-        field: "text",
-      },
-      folderId: {
+      parentId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        field: "folder_id",
+        field: "parent_id",
         references: {
           model: "folders",
           key: "id",
         },
       },
+      orderIndex: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        field: "order_index",
+      },
     },
     {
-      tableName: "lessons",
+      tableName: "folders",
       timestamps: true,
     }
   );
 
-  Lesson.associate = function(models) {
-    Lesson.belongsTo(models.User, {
+  Folder.associate = function(models) {
+    Folder.belongsTo(models.User, {
       foreignKey: 'userId',
       as: 'user'
     });
-    Lesson.belongsTo(models.Class, {
+    Folder.belongsTo(models.Class, {
       foreignKey: 'classId',
       as: 'class'
     });
-    Lesson.belongsTo(models.Folder, {
-      foreignKey: 'folderId',
-      as: 'folder'
+    Folder.belongsTo(models.Folder, {
+      foreignKey: 'parentId',
+      as: 'parent'
     });
-    Lesson.hasMany(models.LessonMedia, {
-      foreignKey: 'lessonId',
-      as: 'media'
+    Folder.hasMany(models.Folder, {
+      foreignKey: 'parentId',
+      as: 'children'
+    });
+    Folder.hasMany(models.Lesson, {
+      foreignKey: 'folderId',
+      as: 'lessons'
     });
   };
 
-  return Lesson;
+  return Folder;
 };
