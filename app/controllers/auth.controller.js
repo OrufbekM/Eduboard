@@ -30,7 +30,7 @@ class AuthController {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { email, password, confirmPassword } = req.body;
+      const { email, password, confirmPassword, username, fullName, phoneNumber } = req.body;
 
       if (password !== confirmPassword) {
         return res.status(400).json({ message: 'Passwords do not match' });
@@ -41,7 +41,17 @@ class AuthController {
         return res.status(400).json({ message: 'User already exists' });
       }
 
-      const user = await User.create({ email, password });
+      const normalizedUsername = username === '' ? null : username;
+      const normalizedFullName = fullName === '' ? null : fullName;
+      const normalizedPhoneNumber = phoneNumber === '' ? null : phoneNumber;
+
+      const user = await User.create({
+        email,
+        password,
+        username: normalizedUsername,
+        fullName: normalizedFullName,
+        phoneNumber: normalizedPhoneNumber
+      });
       const { accessToken, refreshToken } = generateTokens(user);
       
       user.refreshToken = refreshToken;
@@ -49,7 +59,13 @@ class AuthController {
 
       res.status(201).json({
         message: 'User created successfully',
-        user: { id: user.id, email: user.email },
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber
+        },
         accessToken,
         refreshToken
       });

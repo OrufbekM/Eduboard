@@ -22,7 +22,7 @@ app.use('/api/class', classRoutes);
 app.use('/api/lesson', lessonRoutes);
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to EduBoard API' });
+  res.json({ message: 'Welcome to EduNova API' });
 });
 
 const PORT = process.env.PORT || 3000;

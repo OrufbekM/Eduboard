@@ -8,7 +8,10 @@ const router = express.Router();
 const signupValidation = [
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  body('confirmPassword').notEmpty().withMessage('Confirm password is required')
+  body('confirmPassword').notEmpty().withMessage('Confirm password is required'),
+  body('username').optional({ nullable: true, checkFalsy: true }).isLength({ min: 2, max: 30 }).withMessage('Username must be 2-30 characters').trim(),
+  body('fullName').optional({ nullable: true, checkFalsy: true }).isLength({ min: 2, max: 80 }).withMessage('Full name must be 2-80 characters').trim(),
+  body('phoneNumber').optional({ nullable: true, checkFalsy: true }).isLength({ min: 6, max: 20 }).withMessage('Phone number must be 6-20 characters').trim()
 ];
 
 const loginValidation = [
